@@ -11,14 +11,25 @@ public class Maze : MonoBehaviour {
 	private MazeCell[,] cells;
 
 	public IEnumerator Generate() {
-		WaitForSeconds dealy = new WaitForSeconds (generationStepDelay);
+		WaitForSeconds delay = new WaitForSeconds (generationStepDelay);
 		cells = new MazeCell[size.x, size.z];
-		for (int x = 0; x < size.x; x++) {
-			for (int z = 0; z < size.z; z++) {
-				yield return dealy;
-				CreateCell(new IntVector2(x, z));
-			}
+		IntVector2 coordinates = RandomCoordinates;
+		while (ContainsCoordinates(coordinates)) {
+			yield return delay;
+			CreateCell(coordinates);
+			coordinates.z += 1;
+
 		}
+	}
+
+	public IntVector2 RandomCoordinates {
+		get {
+			return new IntVector2(Random.Range(0,size.x), Random.Range(0,size.z));
+		}
+	}
+
+	public bool ContainsCoordinates (IntVector2 coordinate) {
+		return coordinate.x >= 0 && coordinate.x < size.x && coordinate.z >= 0 && coordinate.z < size.z;
 	}
 
 	private void CreateCell(IntVector2 coordinates) {
@@ -27,6 +38,6 @@ public class Maze : MonoBehaviour {
 		newCell.coordinates = coordinates;
 		newCell.name = "Maze Cell" + coordinates.x + ", " + coordinates.z;
 		newCell.transform.parent = transform;
-		newCell.transform.localPosition = new Vector3(x - sizeX * 0.5f + 0.5f, 0f, z - sizeZ * 0.5f + 0.5f);
+		newCell.transform.localPosition = new Vector3(coordinates.x - size.x * 0.5f + 0.5f, 0f, coordinates.z - size.z * 0.5f + 0.5f);
 	}
 }
